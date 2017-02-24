@@ -2,68 +2,16 @@ var log = console.log.bind(console);
 var chokidar = require('chokidar');
 var dateFormat = require('dateformat');
 var ws = require("nodejs-websocket")
-var watchPath = ('.\\TestWatch\\');
+var watchPathInput = ('.\\Test\\InputWatch\\');
+var watchPathOutput = ('.\\Test\\OutputWatch\\');
 
-var watchObject = {};
-watchObject.path = watchPath;
-watchObject.name = "Test1";
-
-
-
-var server = ws.createServer(function (conn) {
-    console.log("New connection")
-    conn.on("text", function (str) {
-        console.log("Received "+str)
-        
-		if(str.startsWith("start"))
-		{
-			//conn.sendText("cmd executed: " + str)
-			console.log("cmd executed.")
-			
-		}
-		else
-		{
-			console.log("Unrecognised sequence.")
-		}
-    })
-    conn.on("close", function (code, reason) {
-        console.log("Connection closed")
-    })
-}).listen(8081)
-
-var watcher = chokidar.watch(watchPath, {
-  persistent: true,
-
-  ignored: '*.txt',
-  ignoreInitial: false,
-  followSymlinks: true,
-  cwd: '.',
-
-  usePolling: true,
-  interval: 100,
-  binaryInterval: 300,
-  alwaysStat: false,
-  depth: 99,
-  awaitWriteFinish: {
-    stabilityThreshold: 2000,
-    pollInterval: 100
-  },
-
-  ignorePermissionErrors: false,
-  atomic: true // or a custom 'atomicity delay', in milliseconds (default 100)
+var inputWatcher = chokidar.watch(watchPathInput).on('all', (event, path) => {
+  handleCase(path, timeNow(), event, "Input Watch");
 });
 
-watcher
-  .on('add', filename => handleCase(filename, timeNow(), 'add'))
-  .on('change', (filename, details) => handleCase(filename, timeNow(), 'mod'))
-  .on('unlink',  filename => handleCase(filename, timeNow(), 'del'));
-  
-watcher
-  .on('addDir', path => handleCase(path, timeNow(), 'add'))
-  .on('unlinkDir', path => handleCase(path, timeNow(), 'del'))
-  .on('error', error => errorHandler(error, timeNow()));
-
-var watchedPaths = watcher.getWatched();
+var outputWatcher = chokidar.watch(watchPathOutput).on('all', (event, path) => {
+  handleCase(path, timeNow(), event, "Output Watch");
+});
   
 function happyPath(path)
 {     
@@ -72,7 +20,7 @@ function happyPath(path)
 
 function timeNow() {
 	var now = new Date();
-	return dateFormat(now,"HH:MM:ss.l   (dd-mm-yyyy)");
+	return dateFormat(now,"HH:MM:ss.l (dd-mm-yyyy)");
 }
 
 function errorHandler(error, timeStamp)
@@ -94,7 +42,7 @@ function errorHandler(error, timeStamp)
 	broadcast(server, message.join(""));
 }
 
-function handleCase(fileName, timeStamp, eventType)
+function handleCase(fileName, timeStamp, eventType, watchName)
 {
 	var message = [];
 	message.push('{ ');
@@ -112,11 +60,11 @@ function handleCase(fileName, timeStamp, eventType)
 	message.push(`,`);
 	
 	message.push(`\"WatchName\":`);
-	message.push(`\"` + "Test1" + `\"`);
+	message.push(`\"` + watchName + `\"`);
 		
 	message.push(' }');
 	
-	console.log(message.join(""));
+	log(message.join(""));
 		
 	broadcast(server, message.join(""));
 }
@@ -127,3 +75,21 @@ function broadcast(server, msg) {
     })
 }
 
+var server = ws.createServer(function (conn) {
+    log("New connection")
+    conn.on("text", function (str) {
+        log("Received "+str)
+        
+		if(str.startsWith("start"))
+		{
+			log("cmd executed.")
+		}
+		else
+		{
+			log("Unrecognised sequence.")
+		}
+    })
+    conn.on("close", function (code, reason) {
+        log("Connection closed")
+    })
+}).listen(8081)

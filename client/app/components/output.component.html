@@ -12,20 +12,19 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor='let result of results' >
-          
-            <td *ngIf="result.EventType == 'add' "class="glyphicon glyphicon-plus"></td>
-            <td *ngIf="result.EventType == 'add' "class="alert alert-success">{{result.FileName}}</td>
-            <td *ngIf="result.EventType == 'add' "class="alert alert-success">{{result.TimeStamp}}</td>
+            <tr *ngFor='let result of results' >
+              <td *ngIf="result.EventType == 'add' && result.WatchName == watch.WatchName"class="glyphicon glyphicon-plus"></td>
+              <td *ngIf="result.EventType == 'add' && result.WatchName == watch.WatchName"class="alert alert-success">{{result.FileName}}</td>
+              <td *ngIf="result.EventType == 'add' && result.WatchName == watch.WatchName"class="alert alert-success">{{result.TimeStamp}}</td>
 
-            <td *ngIf="result.EventType == 'del' "class="glyphicon glyphicon-remove"></td>
-            <td *ngIf="result.EventType == 'del' "class="alert alert-danger">{{result.FileName}}</td>
-            <td *ngIf="result.EventType == 'del' "class="alert alert-danger">{{result.TimeStamp}}</td>
+              <td *ngIf="result.EventType == 'unlink' && result.WatchName == watch.WatchName"class="glyphicon glyphicon-remove"></td>
+              <td *ngIf="result.EventType == 'unlink' && result.WatchName == watch.WatchName"class="alert alert-danger">{{result.FileName}}</td>
+              <td *ngIf="result.EventType == 'unlink' && result.WatchName == watch.WatchName"class="alert alert-danger">{{result.TimeStamp}}</td>
 
-            <td *ngIf="result.EventType == 'mod' "class="glyphicon glyphicon-refresh"></td>
-            <td *ngIf="result.EventType == 'mod' "class="alert alert-info">{{result.FileName}}</td>
-            <td *ngIf="result.EventType == 'mod' "class="alert alert-info">{{result.TimeStamp}}</td>
-          </tr>
+              <td *ngIf="result.EventType == 'change' && result.WatchName == watch.WatchName"class="glyphicon glyphicon-refresh"></td>
+              <td *ngIf="result.EventType == 'change' && result.WatchName == watch.WatchName"class="alert alert-info">{{result.FileName}}</td>
+              <td *ngIf="result.EventType == 'change' && result.WatchName == watch.WatchName"class="alert alert-info">{{result.TimeStamp}}</td>
+            </tr>
         </tbody>
       </table>
     </p-accordionTab>
